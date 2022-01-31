@@ -32,7 +32,7 @@ def output_label(label):
 
 class Model:
     def __init__(self):
-        self.num_epochs = 5
+        self.num_epochs = 1 # TODO: Change to 5
         # Lists for visualization of loss and accuracy
         self.loss_list = []
         self.iteration_list = []
@@ -43,15 +43,22 @@ class Model:
         self.labels_list = []
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        # TODO: Check if model is trained if not train it
         self.train_csv = pd.read_csv("../datasets/fashion-mnist_train.csv")
         self.test_csv = pd.read_csv("../datasets/fashion-mnist_test.csv")
 
         # Transform data into Tensor that has a range from 0 to 1
-        self.train_set = FashionDataset(self.train_csv, transforms.Compose([transforms.ToTensor()]))
-        self.test_set = FashionDataset(self.test_csv, transforms.Compose([transforms.ToTensor()]))
+        self.train_set = FashionDataset(self.train_csv, transform=transforms.Compose([transforms.ToTensor()]))
+        self.test_set = FashionDataset(self.test_csv, transform=transforms.Compose([transforms.ToTensor()]))
 
-        self.train_loader = DataLoader(self.train_set, 100)
-        self.test_loader = DataLoader(self.train_set, 100)
+        self.train_loader = DataLoader(self.train_set, batch_size=100)
+        self.test_loader = DataLoader(self.train_set, batch_size=100)
+
+        a = next(iter(self.train_loader))
+        a[0].size()
+
+        len(self.train_set)
 
         self.model = FashionCNN()
         self.model.to(self.device)
@@ -59,13 +66,14 @@ class Model:
         self.error = nn.CrossEntropyLoss()
 
         self.learning_rate = 0.001
-        self.optimizer = torch.optim.Adam(self.model.parameters(), self.learning_rate)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
-        print("Model initialized")
+        print("-- Model initialized --")
         print("Device: {}".format(self.device))
         print(self.model)
 
     def train(self):
+        print("-- Training started...")
         count = 0
         for epoch in range(self.num_epochs):
             for images, labels in self.train_loader:
@@ -118,7 +126,7 @@ class Model:
                 if not (count % 500):
                     print("Iteration: {}, Loss: {}, Accuracy: {}%".format(count, loss.data, accuracy))
 
-    def showAccuracy(self):
+    def show_accuracy(self):
         class_correct = [0. for _ in range(10)]
         total_correct = [0. for _ in range(10)]
 
@@ -138,7 +146,7 @@ class Model:
         for i in range(10):
             print("Accuracy of {}: {:.2f}%".format(output_label(i), class_correct[i] * 100 / total_correct[i]))
 
-    def showClassifications(self):
+    def show_classifications(self):
         predictions_l = [self.predictions_list[i].tolist() for i in range(len(self.predictions_list))]
         labels_l = [self.labels_list[i].tolist() for i in range(len(self.labels_list))]
         predictions_l = list(chain.from_iterable(predictions_l))
