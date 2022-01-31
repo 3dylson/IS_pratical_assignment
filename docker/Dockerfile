@@ -14,4 +14,4 @@ RUN pip3 install -r /app/requirements.txt
 
 WORKDIR /app
 
-CMD [ "python3", "./src/__init__.py" ]
+CMD [ "python3", "./src/main.py" ]
