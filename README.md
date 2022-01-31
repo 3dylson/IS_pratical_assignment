@@ -2,8 +2,9 @@
 
 ### Building the Docker Container
 
+Open the cmd at the /docker directory and run the following commands:
 ```
-docker container build -t is_modal $your_path_to_the_docker_container_directory
+docker build -t is_model .
 ```
 
 ### Running the Docker Container

@@ -7,7 +7,7 @@ RUN apt update --fix-missing && \
 
 RUN mkdir /app
 
-COPY ./requirements.txt /app
+COPY /requirements.txt /app
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r /app/requirements.txt

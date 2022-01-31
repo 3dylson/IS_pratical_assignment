@@ -1,0 +1,7 @@
+numpy
+torch
+torchvision
+kaggle
+scikit-learn
+opencv-python
+pandas
