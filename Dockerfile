@@ -8,10 +8,15 @@ RUN apt update --fix-missing && \
 RUN mkdir /app
 
 COPY /requirements.txt /app
+COPY /datasets /app
+COPY /FashionCNN.py /app
+COPY /FashionDataset.py /app
+COPY /main.py /app
+COPY /Model.py /app
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r /app/requirements.txt
 
 WORKDIR /app
 
-CMD [ "python3", "./src/main.py" ]
+CMD [ "python3", "./main.py" ]

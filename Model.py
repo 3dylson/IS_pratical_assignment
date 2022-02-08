@@ -4,13 +4,14 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
+import os
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 
-from src.FashionCNN import FashionCNN
-from src.FashionDataset import FashionDataset
+from FashionCNN import FashionCNN
+from FashionDataset import FashionDataset
 
 
 def output_label(label):
@@ -30,9 +31,24 @@ def output_label(label):
     return output_mapping[input]
 
 
+model = FashionCNN()
+error = nn.CrossEntropyLoss()
+learning_rate = 0.001
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+if not os.path.exists("datasets/fashion-mnist_train.csv"):
+    train_csv = pd.read_csv("fashion-mnist_train.csv")
+    test_csv = pd.read_csv("fashion-mnist_test.csv")
+else:
+    train_csv = pd.read_csv("datasets/fashion-mnist_train.csv")
+    test_csv = pd.read_csv("datasets/fashion-mnist_test.csv")
+train_set = FashionDataset(train_csv, transform=transforms.Compose([transforms.ToTensor()]))
+test_set = FashionDataset(test_csv, transform=transforms.Compose([transforms.ToTensor()]))
+train_loader = DataLoader(train_set, batch_size=100)
+test_loader = DataLoader(train_set, batch_size=100)
+
 class Model:
     def __init__(self):
-        self.num_epochs = 1 # TODO: Change to 5
+        self.num_epochs = 5 # TODO: Change to 5
         # Lists for visualization of loss and accuracy
         self.loss_list = []
         self.iteration_list = []
@@ -45,38 +61,25 @@ class Model:
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # TODO: Check if model is trained if not train it
-        self.train_csv = pd.read_csv("../datasets/fashion-mnist_train.csv")
-        self.test_csv = pd.read_csv("../datasets/fashion-mnist_test.csv")
 
         # Transform data into Tensor that has a range from 0 to 1
-        self.train_set = FashionDataset(self.train_csv, transform=transforms.Compose([transforms.ToTensor()]))
-        self.test_set = FashionDataset(self.test_csv, transform=transforms.Compose([transforms.ToTensor()]))
 
-        self.train_loader = DataLoader(self.train_set, batch_size=100)
-        self.test_loader = DataLoader(self.train_set, batch_size=100)
+        # a = next(iter(self.train_loader))
+        # a[0].size()
 
-        a = next(iter(self.train_loader))
-        a[0].size()
+        print(len(train_set))
+        model.to(self.device)
 
-        len(self.train_set)
-
-        self.model = FashionCNN()
-        self.model.to(self.device)
-
-        self.error = nn.CrossEntropyLoss()
-
-        self.learning_rate = 0.001
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
         print("-- Model initialized --")
         print("Device: {}".format(self.device))
-        print(self.model)
+        print(model)
 
     def train(self):
         print("-- Training started...")
         count = 0
         for epoch in range(self.num_epochs):
-            for images, labels in self.train_loader:
+            for images, labels in train_loader:
                 # Transferring images and labels to GPU if available
                 images, labels = images.to(self.device), labels.to(self.device)
 
@@ -84,17 +87,17 @@ class Model:
                 labels = Variable(labels)
 
                 # Forward pass
-                outputs = self.model(train)
-                loss = self.error(outputs, labels)
+                outputs = model(train)
+                loss = error(outputs, labels)
 
                 # Initializing a gradient as 0 so there is no mixing of gradient among the batches
-                self.optimizer.zero_grad()
+                optimizer.zero_grad()
 
                 # Propagating the error backward
                 loss.backward()
 
                 # Optimizing the parameters
-                self.optimizer.step()
+                optimizer.step()
 
                 count += 1
 
@@ -104,13 +107,13 @@ class Model:
                     total = 0
                     correct = 0
 
-                    for images, labels in self.test_loader:
+                    for images, labels in test_loader:
                         images, labels = images.to(self.device), labels.to(self.device)
                         self.labels_list.append(labels)
 
                         test = Variable(images.view(100, 1, 28, 28))
 
-                        outputs = self.model(test)
+                        outputs = model(test)
 
                         predictions = torch.max(outputs, 1)[1].to(self.device)
                         self.predictions_list.append(predictions)
@@ -131,10 +134,10 @@ class Model:
         total_correct = [0. for _ in range(10)]
 
         with torch.no_grad():
-            for images, labels in self.test_loader:
+            for images, labels in test_loader:
                 images, labels = images.to(self.device), labels.to(self.device)
                 test = Variable(images)
-                outputs = self.model(test)
+                outputs = model(test)
                 predicted = torch.max(outputs, 1)[1]
                 c = (predicted == labels).squeeze()
 
