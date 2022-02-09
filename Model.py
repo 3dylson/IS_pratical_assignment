@@ -30,7 +30,7 @@ def output_label(label):
     input = (label.item() if type(label) == torch.Tensor else label)
     return output_mapping[input]
 
-
+#global params we need
 model = FashionCNN()
 error = nn.CrossEntropyLoss()
 learning_rate = 0.001
@@ -48,7 +48,7 @@ test_loader = DataLoader(train_set, batch_size=100)
 
 class Model:
     def __init__(self):
-        self.num_epochs = 5 # TODO: Change to 5
+        self.num_epochs = 15
         # Lists for visualization of loss and accuracy
         self.loss_list = []
         self.iteration_list = []
@@ -60,7 +60,6 @@ class Model:
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        # TODO: Check if model is trained if not train it
 
         # Transform data into Tensor that has a range from 0 to 1
 
