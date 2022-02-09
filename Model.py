@@ -9,7 +9,7 @@ from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
-
+import numpy as np
 from FashionCNN import FashionCNN
 from FashionDataset import FashionDataset
 
@@ -48,7 +48,7 @@ test_loader = DataLoader(train_set, batch_size=100)
 
 class Model:
     def __init__(self):
-        self.num_epochs = 15
+        self.num_epochs = 30
         # Lists for visualization of loss and accuracy
         self.loss_list = []
         self.iteration_list = []
@@ -153,7 +153,7 @@ class Model:
         labels_l = [self.labels_list[i].tolist() for i in range(len(self.labels_list))]
         predictions_l = list(chain.from_iterable(predictions_l))
         labels_l = list(chain.from_iterable(labels_l))
-
         confusion_matrix(labels_l, predictions_l)
+
         print("Classification report for CNN :\n%s\n"
               % (metrics.classification_report(labels_l, predictions_l)))

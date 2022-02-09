@@ -13,6 +13,7 @@ COPY /FashionCNN.py /app
 COPY /FashionDataset.py /app
 COPY /main.py /app
 COPY /Model.py /app
+COPY /trainedModel.pth /app
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r /app/requirements.txt
