@@ -1,7 +1,12 @@
 import torch
+import torch.nn as nn
+from torch.nn import functional as F
+from torch.autograd import Variable
+from torch import optim
+import numpy as np
+import math, random
 
-from Model import Model
-from os.path import exists
+# Generating a noisy multi-sin wave
 
 if __name__ == '__main__':
     if not exists("trainedModel.pth"):

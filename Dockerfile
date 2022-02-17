@@ -9,7 +9,7 @@ RUN mkdir /app
 
 COPY /requirements.txt /app
 COPY /datasets /app
-COPY /FashionCNN.py /app
+COPY /MArrhythmiaRNN.py /app
 COPY /FashionDataset.py /app
 COPY /main.py /app
 COPY /Model.py /app
